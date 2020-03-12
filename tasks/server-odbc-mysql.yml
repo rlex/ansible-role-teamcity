@@ -1,0 +1,31 @@
+---
+- name: "Create mysql-connector dir"
+  file:
+    path: "{{ teamcity_server_mysql_connector_dir }}"
+    state: directory
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    mode: 0755
+
+- name: "Create jdbc dir"
+  file:
+    path: "{{ teamcity_server_mysql_jdbc_dir }}"
+    state: directory
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    mode: 0755
+
+- name: "Download and unpack mysql-connector"
+  unarchive:
+    src: "https://cdn.mysql.com/Downloads/Connector-J/mysql-connector-java-{{ teamcity_server_mysql_connector_version }}.tar.gz"
+    dest: "{{ teamcity_server_mysql_connector_dir }}"
+    copy: no
+    creates: "{{ teamcity_server_mysql_connector_dir }}/mysql-connector-java-{{ teamcity_server_mysql_connector_version }}/mysql-connector-java-{{ teamcity_server_mysql_connector_version }}.jar"
+
+- name: "Create symlink for mysql-connector"
+  file:
+    src: "{{ teamcity_server_mysql_connector_dir }}/mysql-connector-java-{{ teamcity_server_mysql_connector_version }}/mysql-connector-java-{{ teamcity_server_mysql_connector_version }}.jar"
+    dest: "{{ teamcity_server_mysql_jdbc_dir }}/mysql-connector-java-bin.jar"
+    state: link
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"

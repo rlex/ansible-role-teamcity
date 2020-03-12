@@ -1,0 +1,16 @@
+[Unit]
+Description="TeamCity Server"
+Requires=network.target
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User={{ teamcity_system_user }}
+Group={{ teamcity_system_user }}
+EnvironmentFile=/etc/default/teamcity-server
+PIDFile={{ teamcity_server_dir }}/logs/teamcity.pid
+ExecStart={{ teamcity_server_dir }}/bin/teamcity-server.sh start
+ExecStop={{ teamcity_server_dir }}/bin/teamcity-server.sh stop
+
+[Install]
+WantedBy=multi-user.target

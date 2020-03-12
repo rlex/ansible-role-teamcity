@@ -1,0 +1,83 @@
+- name: Check that initial agent setup was done
+  stat:
+    path: "{{ teamcity_system_home }}/.teamcity-agent-setup-done"
+  register: initial_agent_setup_done
+
+- name: download agent package
+  get_url:
+    url: "{{ teamcity_server_url }}/update/buildAgent.zip"
+    dest: /tmp
+    validate_certs: no
+    timeout: 60
+  register: _teamcity_agent_package
+
+- name: create agent build directory
+  file:
+    path: "{{ teamcity_agent_dir }}"
+    state: directory
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    mode: 0755
+
+- name: unpack distribution
+  unarchive:
+    src: /tmp/buildAgent.zip
+    dest: "{{ teamcity_agent_dir }}/"
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    copy: no
+  when: _teamcity_agent_package is changed
+
+- name: "Create dir structure"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    mode: 0755
+  with_items:
+    - "{{ teamcity_agent_dir }}/logs"
+    - "{{ teamcity_agent_dir }}/conf"
+
+- name: create teamcity agent service file
+  template:
+    src: agent/teamcity-agent.service.j2
+    dest: /etc/systemd/system/teamcity-agent.service
+    mode: 0644
+  notify: restart teamcity-agent
+
+# This task should only fire on intial setup, otherwise we will erase auth token
+- name: create teamcity agent configuration
+  template:
+    src: agent/buildAgent.properties.j2
+    dest: "{{ teamcity_agent_dir }}/conf/buildAgent.properties"
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    mode: 0644
+  notify: restart teamcity-agent
+  when: not initial_agent_setup_done.stat.exists
+
+# This task should be used for configuration when inital setup has been done
+- name: create teamcity agent configuration
+  lineinfile:
+    dest: "{{ teamcity_agent_dir }}/conf/buildAgent.properties"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - regexp: "^serverUrl="
+      line: "serverUrl={{ teamcity_server_url }}"
+    - regexp: "^name="
+      line: "name={{ teamcity_agent_name }}"
+  notify: restart teamcity-agent
+  when: initial_agent_setup_done.stat.exists
+
+- name: "Create agent-setup-done"
+  file:
+    path: "{{ teamcity_system_home }}/.teamcity-agent-setup-done"
+    state: touch
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    mode: 0644
+    access_time: preserve
+    modification_time: preserve

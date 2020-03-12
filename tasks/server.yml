@@ -1,0 +1,7 @@
+- include_tasks: server-app.yml
+- include_tasks: server-odbc-mysql.yml
+  when: teamcity_server_db_type == "mysql"
+- include_tasks: server-configure.yml
+- include_tasks: server-license.yml
+- include_tasks: server-plugins.yml
+  when: teamcity_server_plugins and teamcity_server_plugins is defined

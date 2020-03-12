@@ -1,0 +1,5 @@
+TEAMCITY_SERVER_ENABLED=yes
+TEAMCITY_SERVER_PATH="{{ teamcity_server_dir }}"
+TEAMCITY_SERVER_MEM_OPTS="-Xms{{ teamcity_server_memory }}m -Xmx{{ teamcity_server_memory }}m -XX:MaxPermSize=1024m"
+TEAMCITY_DATA_PATH="{{ teamcity_system_home }}/teamcity-server"
+TEAMCITY_SERVER_OPTS=""

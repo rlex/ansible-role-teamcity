@@ -1,0 +1,11 @@
+- name: restart teamcity-server
+  systemd:
+    name: teamcity-server
+    daemon_reload: yes
+    state: restarted
+
+- name: restart teamcity-agent
+  systemd:
+    name: teamcity-agent
+    daemon_reload: yes
+    state: restarted

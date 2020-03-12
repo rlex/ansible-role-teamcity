@@ -1,0 +1,76 @@
+---
+- name: "Get distribution"
+  get_url:
+    url: "http://download.jetbrains.com/teamcity/TeamCity-{{ teamcity_server_version }}.tar.gz"
+    dest: "/tmp/TeamCity-{{ teamcity_server_version }}.tar.gz"
+    validate_certs: no
+    timeout: 60
+    checksum: "sha256:{{ teamcity_server_sha256 }}"
+  register: _teamcity_package
+
+- name: "Add TeamCity service default config"
+  template:
+    src: server/teamcity-server.j2
+    dest: /etc/default/teamcity-server
+    mode: 0644
+
+- name: "Put TeamCity service file (systemd)"
+  template:
+    src: server/teamcity-server.service.j2
+    dest: /etc/systemd/system/teamcity-server.service
+    mode: 0644
+
+- name: "Stop TeamCity Server before upgrade"
+  service:
+    name: teamcity-server
+    state: stopped
+  when: _teamcity_package is changed
+
+- name: Create distro folder
+  file:
+    path: "{{ teamcity_server_install_dir }}/{{ teamcity_server_version }}"
+    state: directory
+
+- name: "Unpack distribution"
+  unarchive:
+    src: "/tmp/TeamCity-{{ teamcity_server_version }}.tar.gz"
+    dest: "{{ teamcity_server_install_dir }}/{{ teamcity_server_version }}"
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    extra_opts: [--strip-components=1]
+    copy: no
+    #FIXME: some better way to check for version
+    creates: "{{ teamcity_server_install_dir }}/{{ teamcity_server_version }}/webapps"
+
+- name: Create symlink to current version
+  file:
+    src: "{{ teamcity_server_install_dir }}/{{ teamcity_server_version }}"
+    dest: "{{ teamcity_server_dir }}"
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    state: link
+
+- name: "Create dir structure"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    mode: 0755
+  with_items:
+    - "{{ teamcity_server_dir }}/logs"
+    - "{{ teamcity_server_config_dir }}"
+
+- name: "Add database config"
+  template:
+    src: "server/database.{{ teamcity_server_db_type }}.properties.j2"
+    dest: "{{ teamcity_server_config_dir }}/database.properties"
+    owner: "{{ teamcity_system_user }}"
+    group: "{{ teamcity_system_group }}"
+    mode: 0644
+
+- name: "Start TeamCity service"
+  service:
+    name: teamcity-server
+    state: started
+    enabled: yes

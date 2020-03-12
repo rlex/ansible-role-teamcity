@@ -1,0 +1,7 @@
+- include_tasks: user.yml
+- include_tasks: server.yml
+  when: teamcity_server is defined and teamcity_server
+  tags: teamcity-server
+- include_tasks: agent.yml
+  when: teamcity_agent is defined and teamcity_agent
+  tags: teamcity-agent

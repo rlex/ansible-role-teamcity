@@ -1,0 +1,48 @@
+### SHARED
+# teamcity user
+teamcity_system_user: teamcity
+teamcity_system_group: teamcity
+teamcity_system_home: /var/lib/teamcity
+
+# teamcity app user
+teamcity_admin_user: teamcity
+teamcity_admin_password: teamcity
+### SERVER
+# teamcity Version
+teamcity_server_version: 2019.2.2
+teamcity_server_sha256: 108e08b1f9f59d533bb1f7e3a498900bb746bb31051c968ba425887b4c5503e9
+
+# teamcity Dirs
+teamcity_server_install_dir: /opt/teamcity-server
+
+# teamcity Plugins
+teamcity_server_plugins: []
+#  - name: "webhook-plugin"
+#    url: https://github.com/tcplugins/tcWebHooks/releases/download/v1.1-alpha8.140.143/tcWebHooksPlugin-1.1-alpha8.140.143.zip
+
+# teamcity Licenses
+teamcity_server_license_keys: []
+
+# MySQL Connector
+teamcity_server_mysql_connector_version: 8.0.19
+teamcity_server_mysql_connector_dir: "/opt/mysql-connector"
+
+# MySQL Database
+teamcity_server_mysql_db_user: teamcity
+teamcity_server_mysql_db_password: teamcity
+teamcity_server_mysql_db_name: teamcity
+teamcity_server_mysql_db_host: localhost
+teamcity_server_mysql_db_port: 3306
+
+# MySQL DB type: Available values: local, mysql
+teamcity_server_db_type: "local"
+
+
+teamcity_server_bind_port: 8111
+teamcity_server_memory: 2048
+
+
+### AGENT
+teamcity_agent_dir: /opt/teamcity-agent
+teamcity_server_url: http://localhost:8111
+teamcity_agent_name: "{{ ansible_hostname }}"
