@@ -37,10 +37,8 @@ teamcity_server_mysql_db_port: 3306
 # MySQL DB type: Available values: local, mysql
 teamcity_server_db_type: "local"
 
-
 teamcity_server_bind_port: 8111
 teamcity_server_memory: 2048
-
 
 ### AGENT
 teamcity_agent_dir: /opt/teamcity-agent
