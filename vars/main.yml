@@ -1,3 +1,4 @@
+teamcity_server_data_dir: "{{ teamcity_system_home }}/teamcity-server"
 teamcity_server_mysql_jdbc_dir: "{{ teamcity_server_data_dir }}/lib/jdbc"
 teamcity_server_admin_user_created: "{{ teamcity_system_home }}/admin-user-created"
 teamcity_server_license_accepted: "{{ teamcity_system_home }}/license-accepted"

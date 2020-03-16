@@ -1,4 +1,9 @@
 ### SHARED
+# dependencies
+teamcity_dependencies:
+  - openjdk-11-jre
+  - unzip
+
 # teamcity user
 teamcity_system_user: teamcity
 teamcity_system_group: teamcity

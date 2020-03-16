@@ -1,0 +1,4 @@
+- name: install dependencies
+  package:
+    name: "{{ teamcity_dependencies }}"
+    state: present
